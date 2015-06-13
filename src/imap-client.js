@@ -1036,6 +1036,31 @@
             throw error;
         });
     };
+    
+    /**
+     * Purges messages from a folder
+     * @param {String} options.path The origin path where the messages reside
+     * @param {String} options.interval The uids of the messages to be deleted
+     *
+     * @returns {Promise}
+     */
+    ImapClient.prototype.deleteMessages = function(options) {
+        var self = this,
+            queryOptions = {
+                byUid: true,
+                precheck: self._ensurePath(options.path)
+            };
+
+        axe.debug(DEBUG_TAG, 'deleting uids ' + options.interval + ' from ' + options.path);
+        return self._checkOnline().then(function() {
+            return self._client.deleteMessages(options.interval, queryOptions);
+        }).then(function() {
+            axe.debug(DEBUG_TAG, 'successfully deleted uids ' + options.interval + ' from ' + options.path);
+        }).catch(function(error) {
+            axe.error(DEBUG_TAG, 'error deleting uids ' + options.interval + ' from ' + options.path + ' : ' + error + '\n' + error.stack);
+            throw error;
+        });
+    };
 
     //
     // Helper methods
